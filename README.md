@@ -15,7 +15,7 @@ Design
 - ^student/ -- ^verify/$    POST email, password => true/false
             |- ^info/$      POST email, password => name, nickname
 
-- ^courses/ -- ^$           POST email, password => courses selected
+- ^courses/ -- ^selected$   POST email, password => courses selected
             |- ^upcoming/$  POST email, password => upcoming courses
             |- ^current/$   POST email, password => current courses
             |- ^past/$      POST email, password => past courses

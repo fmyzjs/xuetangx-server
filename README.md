@@ -1,4 +1,4 @@
-xuetangx-server
+XuetangX Server
 ===============
 
 http://xuetangxserver.sinaapp.com/

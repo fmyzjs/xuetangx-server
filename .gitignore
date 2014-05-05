@@ -52,3 +52,6 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+# SAE specified files
+config.yaml
+index.wsgi

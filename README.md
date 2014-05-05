@@ -12,16 +12,16 @@ Design
 
 - client    => handle http(s) request
 
-- ^student/ -- verify/$             POST email, password
-            |- info/$               POST email, password
-            |- courses/$            POST email, password
-            |- courses/upcoming/$   POST email, password
-            |- courses/current/$    POST email, password
-            |- courses/past/$       POST email, password
+- ^student/ -- ^verify/$    POST email, password => true/false
+            |- ^info/$      POST email, password => name, nickname
 
-- ^courses/ -- search/$             POST category, started, hasTA
-            |- about/$              POST url
-            |- info/$               POST email, password, url
-            |- ware/$               POST email, password, url
+- ^courses/ -- ^$           POST email, password => courses selected
+            |- ^upcoming/$  POST email, password => upcoming courses
+            |- ^current/$   POST email, password => current courses
+            |- ^past/$      POST email, password => past courses
+            |- ^search/$    POST category, started, hasTA => satisfied courses
+            |- ^about/$     POST url => course introduction page
+            |- ^info/$      POST email, password, url => course main page
+            |- ^ware/$      POST email, password, url => courseware page
 
 ```

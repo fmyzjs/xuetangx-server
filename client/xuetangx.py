@@ -68,11 +68,11 @@ def student_info(email, password):
     """
     opener = __get_opener__(email, password)
     page = opener.open(DASHBOARD).read()
-    from BeautifulSoup import BeautifulSoup
+    from bs4 import BeautifulSoup
     try:
-        parsed_page = BeautifulSoup(page)
-        name = parsed_page.body.find('span', attrs={'class': 'data'}).text
-        nickname = parsed_page.body.find('h1', attrs={'class': 'user-name'}).text
+        page = BeautifulSoup(page)
+        name = page.body.find('span', attrs={'class': 'data'}).text
+        nickname = page.body.find('h1', attrs={'class': 'user-name'}).text
     except Exception as e:
         utils.admin.email_html_error(e, page)
         raise e

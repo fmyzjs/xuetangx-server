@@ -10,22 +10,22 @@ def email_notice(subject, message):
 def email_http_error(exception, opener, url, data=None):
     email_notice(
         '[XuetangX] HTTP(S) Error',
-        """Opener: %s,
-URL: %s,
-Data: %s,
-Exception: %s
+        """Exception: %s
+Opener: %s
+URL: %s
+Data: %s
 """ % (opener, url, data, exception))
 
 def email_json_error(exception, string):
     email_notice(
         '[XuetangX] JSON Parse Error',
-        """String: %s,
-Exception: %s
+        """Exception: %s
+String: %s
 """ % (string, exception))
 
 def email_html_error(exception, page):
     email_notice(
         '[XuetangX] HTML Parse Error',
-        """Page: %s,
-Exception: %s
+        """Exception: %s
+Page: %s
 """ % (page, exception))

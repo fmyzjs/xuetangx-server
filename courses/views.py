@@ -27,7 +27,7 @@ def upcoming(request):
         return HttpResponse(utils.template.server_error())
 
     return HttpResponse(utils.template.respond({
-        'courses': courses,
+        'courses.upcoming': courses,
     }))
 
 def current(request):

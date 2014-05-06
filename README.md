@@ -64,7 +64,19 @@ APIs
 #### upcoming
 
     POST { 'email': str, 'password': str }
-    =>
+    => { 'courses.upcoming': [@course] }
+
+    @course: {
+        'university': str,
+        'id': str,
+        'title': str,
+        'start_date': {
+            'year': int,
+            'month': int,
+            'day': int
+        },
+        'img_url': str,
+    }
 
 #### current
 

@@ -7,10 +7,7 @@ http://xuetangxserver.sinaapp.com/
 Design
 ------
 
-```
 - xuetangx  => main
-
-- client    => handle http(s) request
 
 - ^student/ -- ^verify/$    POST email, password => true/false
             |- ^info/$      POST email, password => name, nickname
@@ -24,4 +21,28 @@ Design
             |- ^info/$      POST email, password, url => course main page
             |- ^ware/$      POST email, password, url => courseware page
 
-```
+response header:
+    'valid':
+    - false => Request format error
+    - true
+      => 'error':
+      + true  => Server error
+      + false
+        => 'authen':
+        - fasle => Email/password error
+        - true  => ...
+
+APIs
+----
+
+### student
+
+#### verify (atually, no extra field is needed)
+
+    POST { 'email': str, 'password': str }
+    => { 'student.verify': bool }
+
+#### info
+
+    POST { 'email': str, 'password': str }
+    => { 'student.name': str, 'student.nickname': str }

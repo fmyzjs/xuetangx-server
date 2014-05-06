@@ -6,6 +6,11 @@ class CSRFOpenerDirector:
         self.__cookie__ = cookielib.CookieJar()
         cjhdr = urllib2.HTTPCookieProcessor(self.__cookie__)
         self.__opener__ = urllib2.build_opener(cjhdr)
+    def __unicode__(self):
+        return """Cookie: %s,
+Additional Headers: %s
+Opener: %s,
+""" % (self.__cookie__, self.__opener__.addheaders, self.__opener__)
     def open(self, fullurl, data=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
         csrftoken = None
         for cookie in self.__cookie__:

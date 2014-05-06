@@ -17,3 +17,6 @@ urlpatterns = patterns('',
     url(r'^student/', include("student.urls")),
     url(r'^courses/', include("courses.urls")),
 )
+
+handler404 = 'xuetangx.views.my_custom_404_view'
+handler500 = 'xuetangx.views.my_custom_error_view'

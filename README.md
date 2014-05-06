@@ -4,6 +4,9 @@ XuetangX Server
 http://xuetangxserver.sinaapp.com/
 
 
+**NOTE**: Remember to CHANGE POST TO GET after dev
+
+
 Design
 ------
 
@@ -12,7 +15,7 @@ Design
 - ^student/ -- ^verify/$    POST email, password => true/false
             |- ^info/$      POST email, password => name, nickname
 
-- ^courses/ -- ^selected$   POST email, password => courses selected
+- ^courses/ -- ^selected$   POST email, password => all selected courses
             |- ^upcoming/$  POST email, password => upcoming courses
             |- ^current/$   POST email, password => current courses
             |- ^past/$      POST email, password => past courses
@@ -21,6 +24,7 @@ Design
             |- ^info/$      POST email, password, url => course main page
             |- ^ware/$      POST email, password, url => courseware page
 
+```
 response header:
     'valid':
     - false => Request format error
@@ -31,6 +35,8 @@ response header:
         => 'authen':
         - fasle => Email/password error
         - true  => ...
+```
+
 
 APIs
 ----
@@ -46,3 +52,47 @@ APIs
 
     POST { 'email': str, 'password': str }
     => { 'student.name': str, 'student.nickname': str }
+
+
+### courses
+
+#### selected
+
+    POST { 'email': str, 'password': str }
+    =>
+
+#### upcoming
+
+    POST { 'email': str, 'password': str }
+    =>
+
+#### current
+
+    POST { 'email': str, 'password': str }
+    =>
+
+#### past
+
+    POST { 'email': str, 'password': str }
+    =>
+
+#### search
+
+    POST { 'email': str, 'password': str }
+    =>
+
+#### about
+
+    POST { 'email': str, 'password': str }
+    =>
+
+#### info
+
+    POST { 'email': str, 'password': str }
+    =>
+
+#### ware
+
+    POST { 'email': str, 'password': str }
+    =>
+

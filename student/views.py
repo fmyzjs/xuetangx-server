@@ -21,8 +21,8 @@ def verify(request):
 
 def info(request):
     try:
-        email = request.GET['email']
-        password = request.GET['password']
+        email = request.POST['email']
+        password = request.POST['password']
     except (ValueError, KeyError):
         return HttpResponse(utils.template.invalid_request())
 

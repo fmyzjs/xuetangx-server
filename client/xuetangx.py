@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
 import urllib
 
 from client.csrfopner import CSRFOpenerDirector
@@ -9,6 +12,7 @@ HOST = 'www.xuetangx.com'
 LOGIN_PAGE = HTTPS + HOST + '/login'
 LOGIN_URL = HTTPS + HOST + '/login_ajax'
 DASHBOARD = HTTPS + HOST + '/dashboard'
+BASE_URL = HTTPS + HOST
 
 class AutoEmailOpener:
     import socket
@@ -78,3 +82,45 @@ def student_info(email, password):
         raise e
 
     return (name, nickname)
+
+def courses_upcoming(email, password):
+    """
+    email: str
+    password: str
+    => list(courses*)
+    """
+    opener = __get_opener__(email, password)
+    page = opener.open(DASHBOARD).read()
+
+    from bs4 import BeautifulSoup
+    import dateutil.parser
+
+    courses = []
+    try:
+        page = BeautifulSoup(page)
+        for course in page.findAll('article', attrs={'class': 'my-course'}):
+            date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
+            if date_block[0] != u'课程开始':
+                continue
+            start_date = dateutil.parser.parse(date_block[-1])
+            university = course.find('h2', attrs={'class': 'university'}).text
+            id_title = course.find('section', attrs={'class': 'info'}).find('h3').find('span').text.split()
+            course_id = id_title[0]
+            title = id_title[1]
+            img_url = BASE_URL + course.find('img').attrs['src']
+            courses.append({
+                'university': university,
+                'id': course_id,
+                'title': title,
+                'start_date': {
+                    'year': start_date.year,
+                    'month': start_date.month,
+                    'day': start_date.day
+                },
+                'img_url': img_url,
+            })
+    except Exception as e:
+        utils.admin.email_html_error(e, page)
+        raise e
+
+    return courses

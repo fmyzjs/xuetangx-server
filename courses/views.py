@@ -1,6 +1,7 @@
-from django.shortcuts import render
-
 from django.http import HttpResponse
+
+import client.xuetangx as xuetangx
+import utils.template
 
 def selected(request):
     try:
@@ -18,7 +19,16 @@ def upcoming(request):
     except (ValueError, KeyError):
         return HttpResponse(utils.template.invalid_request())
 
-    return HttpResponse("You're at the courses upcoming.")
+    try:
+        courses = xuetangx.courses_upcoming(email, password)
+    except xuetangx.AuthenticationError:
+        return HttpResponse(utils.template.authen_error())
+    except Exception:
+        return HttpResponse(utils.template.server_error())
+
+    return HttpResponse(utils.template.respond({
+        'courses': courses,
+    }))
 
 def current(request):
     try:

@@ -107,10 +107,13 @@ ROOT_URLCONF = 'xuetangx.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'xuetangx.wsgi.application'
 
+import os
+xuetangx = os.path.dirname(__file__)
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.join(xuetangx, '..', 'templates'),
 )
 
 INSTALLED_APPS = (
@@ -156,3 +159,9 @@ LOGGING = {
         },
     }
 }
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'xuetangx.leonhuang@gmail.com'
+EMAIL_HOST_PASSWORD = 'leonxinhuang@gmail.com'
+EMAIL_PORT = 587

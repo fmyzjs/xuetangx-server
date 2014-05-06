@@ -78,21 +78,21 @@ APIs
 
 #### search
 
-    POST { 'email': str, 'password': str }
+    POST { 'key': str, 'category': str, 'started': bool, 'hasTA': bool }
     =>
 
 #### about
 
-    POST { 'email': str, 'password': str }
+    POST { 'url': str }
     =>
 
 #### info
 
-    POST { 'email': str, 'password': str }
+    POST { 'email': str, 'password': str, 'url': str }
     =>
 
 #### ware
 
-    POST { 'email': str, 'password': str }
+    POST { 'email': str, 'password': str, 'url': str }
     =>
 

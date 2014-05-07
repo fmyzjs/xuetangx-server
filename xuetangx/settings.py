@@ -1,10 +1,10 @@
 # Django settings for xuetangx project.
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+    ('Xin Huang', 'leonxinhuang@gmail.com'),
 )
 
 MANAGERS = ADMINS
@@ -103,6 +103,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'utils.error.AuthenFailMiddleware',
 )
 
 ROOT_URLCONF = 'xuetangx.urls'
@@ -142,6 +143,14 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s [%(asctime)s] %(module)s %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
@@ -155,9 +164,19 @@ LOGGING = {
         }
     },
     'loggers': {
+        'django': {
+            'handlers': ['mail_admins'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
         'django.request': {
             'handlers': ['mail_admins'],
-            'level': 'ERROR',
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'scheduling': {
+            'handlers': ['mail_admins'],
+            'level': 'DEBUG',
             'propagate': True,
         },
     }
@@ -168,3 +187,6 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'xuetangx.leonhuang@gmail.com'
 EMAIL_HOST_PASSWORD = 'leonxinhuang@gmail.com'
 EMAIL_PORT = 587
+
+SEND_BROKEN_LINK_EMAILS = True
+SERVER_EMAIL = DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

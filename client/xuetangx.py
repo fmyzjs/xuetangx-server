@@ -6,7 +6,6 @@ from datetime import datetime
 
 from client.csrfopner import CSRFOpenerDirector
 from bs4 import BeautifulSoup
-import utils.admin
 
 HTTP = 'http://'
 HTTPS = 'https://'
@@ -21,19 +20,6 @@ def full_url(path):
         return BASE_URL + path
     return path
 
-class AutoEmailOpener:
-    import socket
-    def __init__(self, opener):
-        self.__opener__ = opener
-    def __unicode__(self):
-        return self.__opener__.__str__()
-    def open(self, fullurl, data=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
-        try:
-            return self.__opener__.open(fullurl, data, timeout)
-        except Exception as e:
-            utils.admin.email_http_error(e, self.__opener__, fullurl, data)
-            raise e
-
 class AuthenticationError(Exception):
     pass
 
@@ -43,7 +29,7 @@ def __get_opener__(email, password):
     password: str
     => CSRFOpenerDirector
     """
-    opener = AutoEmailOpener(CSRFOpenerDirector())
+    opener = CSRFOpenerDirector()
     opener.open(LOGIN_PAGE)
     postdata = urllib.urlencode({
         'email': email,
@@ -51,11 +37,7 @@ def __get_opener__(email, password):
     resp = opener.open(LOGIN_URL, postdata).read()
 
     import json
-    try:
-        success = json.loads(resp)['success']
-    except (ValueError, KeyError) as e:
-        utils.admin.email_json_error(e, resp)
-        raise e
+    success = json.loads(resp)['success']
 
     if not success:
         raise AuthenticationError()
@@ -84,13 +66,9 @@ def student_info(email, password):
     page = __get_page__(DASHBOARD, email, password)
 
     from bs4 import BeautifulSoup
-    try:
-        page = BeautifulSoup(page)
-        name = page.body.find('span', attrs={'class': 'data'}).text
-        nickname = page.body.find('h1', attrs={'class': 'user-name'}).text
-    except Exception as e:
-        utils.admin.email_html_error(e, page)
-        raise e
+    page = BeautifulSoup(page)
+    name = page.body.find('span', attrs={'class': 'data'}).text
+    nickname = page.body.find('h1', attrs={'class': 'user-name'}).text
 
     return (name, nickname)
 
@@ -168,19 +146,15 @@ def courses_selected(email, password):
     current = []
     past = []
     page = __get_page__(DASHBOARD, email, password)
-    try:
-        page = BeautifulSoup(page)
-        for course in page.findAll('article', attrs={'class': 'my-course'}):
-            date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
-            if date_block[0] == u'课程开始':
-                upcoming.append(__upcoming__(course))
-            elif date_block[0] == u'课程已开始':
-                current.append(__current__(course))
-            elif date_block[0] == u'课程完成度':
-                past.append(__past__(course))
-    except Exception as e:
-        utils.admin.email_html_error(e, page)
-        raise e
+    page = BeautifulSoup(page)
+    for course in page.findAll('article', attrs={'class': 'my-course'}):
+        date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
+        if date_block[0] == u'课程开始':
+            upcoming.append(__upcoming__(course))
+        elif date_block[0] == u'课程已开始':
+            current.append(__current__(course))
+        elif date_block[0] == u'课程完成度':
+            past.append(__past__(course))
 
     return (upcoming, current, past)
 
@@ -192,15 +166,11 @@ def courses_upcoming(email, password):
     """
     upcoming = []
     page = __get_page__(DASHBOARD, email, password)
-    try:
-        page = BeautifulSoup(page)
-        for course in page.findAll('article', attrs={'class': 'my-course'}):
-            date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
-            if date_block[0] == u'课程开始':
-                upcoming.append(__upcoming__(course))
-    except Exception as e:
-        utils.admin.email_html_error(e, page)
-        raise e
+    page = BeautifulSoup(page)
+    for course in page.findAll('article', attrs={'class': 'my-course'}):
+        date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
+        if date_block[0] == u'课程开始':
+            upcoming.append(__upcoming__(course))
 
     return upcoming
 
@@ -212,15 +182,11 @@ def courses_current(email, password):
     """
     current = []
     page = __get_page__(DASHBOARD, email, password)
-    try:
-        page = BeautifulSoup(page)
-        for course in page.findAll('article', attrs={'class': 'my-course'}):
-            date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
-            if date_block[0] == u'课程已开始':
-                current.append(__current__(course))
-    except Exception as e:
-        utils.admin.email_html_error(e, page)
-        raise e
+    page = BeautifulSoup(page)
+    for course in page.findAll('article', attrs={'class': 'my-course'}):
+        date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
+        if date_block[0] == u'课程已开始':
+            current.append(__current__(course))
 
     return current
 
@@ -232,14 +198,10 @@ def courses_past(email, password):
     """
     past = []
     page = __get_page__(DASHBOARD, email, password)
-    try:
-        page = BeautifulSoup(page)
-        for course in page.findAll('article', attrs={'class': 'my-course'}):
-            date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
-            if date_block[0] == u'课程完成度':
-                past.append(__past__(course))
-    except Exception as e:
-        utils.admin.email_html_error(e, page)
-        raise e
+    page = BeautifulSoup(page)
+    for course in page.findAll('article', attrs={'class': 'my-course'}):
+        date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
+        if date_block[0] == u'课程完成度':
+            past.append(__past__(course))
 
     return past

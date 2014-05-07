@@ -10,7 +10,18 @@ def selected(request):
     except (ValueError, KeyError):
         return HttpResponse(utils.template.invalid_request())
 
-    return HttpResponse("You're at the courses selected.")
+    try:
+        courses_upcoming, courses_current, courses_past = xuetangx.courses_selected(email, password)
+    except xuetangx.AuthenticationError:
+        return HttpResponse(utils.template.authen_error())
+    except Exception:
+        return HttpResponse(utils.template.server_error())
+
+    return HttpResponse(utils.template.respond({
+        'courses.upcoming': courses_upcoming,
+        'courses_current': courses_current,
+        'courses_past': courses_past,
+    }))
 
 def upcoming(request):
     try:

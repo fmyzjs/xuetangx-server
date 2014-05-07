@@ -92,14 +92,7 @@ def student_info(email, password):
 
     return (name, nickname)
 
-def courses_upcoming(email, password):
-    """
-    email: str
-    password: str
-    => list(course*)
-    """
-    page = __get_page__(DASHBOARD, email, password)
-
+def __upcoming__(page):
     from bs4 import BeautifulSoup
     from datetime import datetime
 
@@ -133,14 +126,7 @@ def courses_upcoming(email, password):
 
     return courses
 
-def courses_current(email, password):
-    """
-    email: str
-    password: str
-    => list(course*)
-    """
-    page = __get_page__(DASHBOARD, email, password)
-
+def __current__(page):
     from bs4 import BeautifulSoup
     from datetime import datetime
 
@@ -176,14 +162,7 @@ def courses_current(email, password):
 
     return courses
 
-def courses_past(email, password):
-    """
-    email: str
-    password: str
-    => list(course*)
-    """
-    page = __get_page__(DASHBOARD, email, password)
-
+def __past__(page):
     from bs4 import BeautifulSoup
     from datetime import datetime
 
@@ -218,3 +197,39 @@ def courses_past(email, password):
         raise e
 
     return courses
+
+def courses_selected(email, password):
+    """
+    email: str
+    password: str
+    => (courses_upcoming, courses_current, courses_past)
+    """
+    page = __get_page__(DASHBOARD, email, password)
+    return (__upcoming__(page), __current__(page), __past__(page))
+
+def courses_upcoming(email, password):
+    """
+    email: str
+    password: str
+    => list(course*)
+    """
+    page = __get_page__(DASHBOARD, email, password)
+    return __upcoming__(page)
+
+def courses_current(email, password):
+    """
+    email: str
+    password: str
+    => list(course*)
+    """
+    page = __get_page__(DASHBOARD, email, password)
+    return __current__(page)
+
+def courses_past(email, password):
+    """
+    email: str
+    password: str
+    => list(course*)
+    """
+    page = __get_page__(DASHBOARD, email, password)
+    return __past__(page)

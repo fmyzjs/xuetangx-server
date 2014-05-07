@@ -37,7 +37,16 @@ def current(request):
     except (ValueError, KeyError):
         return HttpResponse(utils.template.invalid_request())
 
-    return HttpResponse("You're at the courses current.")
+    try:
+        courses = xuetangx.courses_current(email, password)
+    except xuetangx.AuthenticationError:
+        return HttpResponse(utils.template.authen_error())
+    except Exception:
+        return HttpResponse(utils.template.server_error())
+
+    return HttpResponse(utils.template.respond({
+        'courses.current': courses,
+    }))
 
 def past(request):
     try:

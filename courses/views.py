@@ -55,7 +55,16 @@ def past(request):
     except (ValueError, KeyError):
         return HttpResponse(utils.template.invalid_request())
 
-    return HttpResponse("You're at the courses past.")
+    try:
+        courses = xuetangx.courses_past(email, password)
+    except xuetangx.AuthenticationError:
+        return HttpResponse(utils.template.authen_error())
+    except Exception:
+        return HttpResponse(utils.template.server_error())
+
+    return HttpResponse(utils.template.respond({
+        'courses.past': courses,
+    }))
 
 def search(request):
     try:

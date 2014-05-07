@@ -60,6 +60,10 @@ def __get_opener__(email, password):
 
     return opener
 
+def __get_page__(url, email, password):
+    opener = __get_opener__(email, password)
+    return opener.open(url).read()
+
 def verify(email, password):
     """
     email: str
@@ -75,8 +79,7 @@ def student_info(email, password):
     password: str
     => (name, nickname)
     """
-    opener = __get_opener__(email, password)
-    page = opener.open(DASHBOARD).read()
+    page = __get_page__(DASHBOARD, email, password)
 
     from bs4 import BeautifulSoup
     try:
@@ -95,8 +98,7 @@ def courses_upcoming(email, password):
     password: str
     => list(course*)
     """
-    opener = __get_opener__(email, password)
-    page = opener.open(DASHBOARD).read()
+    page = __get_page__(DASHBOARD, email, password)
 
     from bs4 import BeautifulSoup
     from datetime import datetime
@@ -137,8 +139,7 @@ def courses_current(email, password):
     password: str
     => list(course*)
     """
-    opener = __get_opener__(email, password)
-    page = opener.open(DASHBOARD).read()
+    page = __get_page__(DASHBOARD, email, password)
 
     from bs4 import BeautifulSoup
     from datetime import datetime
@@ -181,8 +182,7 @@ def courses_past(email, password):
     password: str
     => list(course*)
     """
-    opener = __get_opener__(email, password)
-    page = opener.open(DASHBOARD).read()
+    page = __get_page__(DASHBOARD, email, password)
 
     from bs4 import BeautifulSoup
     from datetime import datetime

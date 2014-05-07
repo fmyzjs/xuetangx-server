@@ -59,7 +59,11 @@ APIs
 #### selected
 
     POST { 'email': str, 'password': str }
-    =>
+    => {
+        'courses.upcoming': [@course],
+        'courses.current': [@course],
+        'courses.past': [@course]
+    }
 
 #### upcoming
 
@@ -81,7 +85,7 @@ APIs
 #### current
 
     POST { 'email': str, 'password': str }
-    => { 'courses.upcoming': [@course] }
+    => { 'courses.current': [@course] }
 
     @course: {
         'university': str,
@@ -99,7 +103,20 @@ APIs
 #### past
 
     POST { 'email': str, 'password': str }
-    =>
+    => { 'courses.past': [@course] }
+
+    @course: {
+        'university': str,
+        'id': str,
+        'title': str,
+        'start_date': {
+            'year': int,
+            'month': int,
+            'day': int
+        },
+        'img_url': str,
+        'course_info_url': str,
+    }
 
 #### search
 

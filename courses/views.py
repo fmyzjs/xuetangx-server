@@ -19,8 +19,8 @@ def selected(request):
 
     return HttpResponse(utils.template.respond({
         'courses.upcoming': courses_upcoming,
-        'courses_current': courses_current,
-        'courses_past': courses_past,
+        'courses.current': courses_current,
+        'courses.past': courses_past,
     }))
 
 def upcoming(request):

@@ -13,6 +13,7 @@ HOST = 'www.xuetangx.com'
 LOGIN_PAGE = HTTPS + HOST + '/login'
 LOGIN_URL = HTTPS + HOST + '/login_ajax'
 DASHBOARD = HTTPS + HOST + '/dashboard'
+COURSES = HTTP + HOST + '/courses'
 BASE_URL = HTTPS + HOST
 
 def full_url(path):
@@ -23,7 +24,7 @@ def full_url(path):
 class AuthenticationError(Exception):
     pass
 
-def __get_opener__(email, password):
+def __get_opener__(email=None, password=None):
     """
     email: str
     password: str
@@ -31,6 +32,9 @@ def __get_opener__(email, password):
     """
     opener = CSRFOpenerDirector()
     opener.open(LOGIN_PAGE)
+    if email is None or password is None:
+        return opener
+
     postdata = urllib.urlencode({
         'email': email,
         'password': password}).encode('utf-8')
@@ -44,7 +48,7 @@ def __get_opener__(email, password):
 
     return opener
 
-def __get_page__(url, email, password):
+def __get_page__(url, email=None, password=None):
     opener = __get_opener__(email, password)
     return opener.open(url).read()
 
@@ -205,3 +209,18 @@ def courses_past(email, password):
             past.append(__past__(course))
 
     return past
+
+def courses_categories():
+    page = __get_page__(COURSES)
+    page = BeautifulSoup(page)
+
+    categories = []
+    for item in page.find('div', attrs={'class': 'xkfl'}).findAll('a'):
+        cid = item.attrs['data-id']
+        title = item.text
+        categories.append({
+            'id': cid,
+            'title': title,
+        })
+
+    return categories

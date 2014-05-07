@@ -45,6 +45,11 @@ def past(request):
         'courses.past': courses,
     }))
 
+def categories(request):
+    return HttpResponse(utils.template.respond({
+        'courses.categories': xuetangx.courses_categories(),
+    }))
+
 def search(request):
     key = request.GET['key']
     category = request.GET['category']

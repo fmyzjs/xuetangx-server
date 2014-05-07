@@ -118,6 +118,13 @@ APIs
         'course_info_url': str,
     }
 
+#### categories
+
+    POST
+    => { 'courses.categories': [
+        { 'id': str, 'title': str }*
+    ] }
+
 #### search
 
     POST { 'key': str, 'category': str, 'started': bool, 'hasTA': bool }

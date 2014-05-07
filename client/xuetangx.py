@@ -2,8 +2,10 @@
 # encoding: utf-8
 
 import urllib
+from datetime import datetime
 
 from client.csrfopner import CSRFOpenerDirector
+from bs4 import BeautifulSoup
 import utils.admin
 
 HTTP = 'http://'
@@ -92,111 +94,69 @@ def student_info(email, password):
 
     return (name, nickname)
 
-def __upcoming__(page):
-    from bs4 import BeautifulSoup
-    from datetime import datetime
+def __upcoming__(course):
+    date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
+    start_date = datetime.strptime(date_block[-1], '%Y-%m-%d')
+    university = course.find('h2', attrs={'class': 'university'}).text
+    id_title = course.find('section', attrs={'class': 'info'}).find('h3').find('span').text.split()
+    course_id = id_title[0]
+    title = id_title[1]
+    img_url = full_url(course.find('img').attrs['src'])
+    return {
+        'university': university,
+        'id': course_id,
+        'title': title,
+        'start_date': {
+            'year': start_date.year,
+            'month': start_date.month,
+            'day': start_date.day
+        },
+        'img_url': img_url,
+    }
 
-    courses = []
-    try:
-        page = BeautifulSoup(page)
-        for course in page.findAll('article', attrs={'class': 'my-course'}):
-            date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
-            if date_block[0] != u'课程开始':
-                continue
-            start_date = datetime.strptime(date_block[-1], '%Y-%m-%d')
-            university = course.find('h2', attrs={'class': 'university'}).text
-            id_title = course.find('section', attrs={'class': 'info'}).find('h3').find('span').text.split()
-            course_id = id_title[0]
-            title = id_title[1]
-            img_url = full_url(course.find('img').attrs['src'])
-            courses.append({
-                'university': university,
-                'id': course_id,
-                'title': title,
-                'start_date': {
-                    'year': start_date.year,
-                    'month': start_date.month,
-                    'day': start_date.day
-                },
-                'img_url': img_url,
-            })
-    except Exception as e:
-        utils.admin.email_html_error(e, page)
-        raise e
+def __current__(course):
+    date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
+    start_date = datetime.strptime(date_block[-1], '%Y-%m-%d')
+    university = course.find('h2', attrs={'class': 'university'}).text
+    id_title = course.find('section', attrs={'class': 'info'}).find('h3').find('a').text.split()
+    course_id = id_title[0]
+    title = id_title[1]
+    img_url = full_url(course.find('img').attrs['src'])
+    course_info_url = full_url(course.find('a', attrs={'class': 'enter-course'}).attrs['href'])
+    return {
+        'university': university,
+        'id': course_id,
+        'title': title,
+        'start_date': {
+            'year': start_date.year,
+            'month': start_date.month,
+            'day': start_date.day
+        },
+        'img_url': img_url,
+        'course_info_url': course_info_url,
+    }
 
-    return courses
-
-def __current__(page):
-    from bs4 import BeautifulSoup
-    from datetime import datetime
-
-    courses = []
-    try:
-        page = BeautifulSoup(page)
-        for course in page.findAll('article', attrs={'class': 'my-course'}):
-            date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
-            if date_block[0] != u'课程已开始':
-                continue
-            start_date = datetime.strptime(date_block[-1], '%Y-%m-%d')
-            university = course.find('h2', attrs={'class': 'university'}).text
-            id_title = course.find('section', attrs={'class': 'info'}).find('h3').find('a').text.split()
-            course_id = id_title[0]
-            title = id_title[1]
-            img_url = full_url(course.find('img').attrs['src'])
-            course_info_url = full_url(course.find('a', attrs={'class': 'enter-course'}).attrs['href'])
-            courses.append({
-                'university': university,
-                'id': course_id,
-                'title': title,
-                'start_date': {
-                    'year': start_date.year,
-                    'month': start_date.month,
-                    'day': start_date.day
-                },
-                'img_url': img_url,
-                'course_info_url': course_info_url,
-            })
-    except Exception as e:
-        utils.admin.email_html_error(e, page)
-        raise e
-
-    return courses
-
-def __past__(page):
-    from bs4 import BeautifulSoup
-    from datetime import datetime
-
-    courses = []
-    try:
-        page = BeautifulSoup(page)
-        for course in page.findAll('article', attrs={'class': 'my-course'}):
-            date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
-            if date_block[0] != u'课程完成度':
-                continue
-            start_date = datetime.strptime(date_block[-1], '%Y-%m-%d')
-            university = course.find('h2', attrs={'class': 'university'}).text
-            id_title = course.find('section', attrs={'class': 'info'}).find('h3').find('a').text.split()
-            course_id = id_title[0]
-            title = id_title[1]
-            img_url = full_url(course.find('img').attrs['src'])
-            course_info_url = full_url(course.find('a', attrs={'class': 'enter-course'}).attrs['href'])
-            courses.append({
-                'university': university,
-                'id': course_id,
-                'title': title,
-                'start_date': {
-                    'year': start_date.year,
-                    'month': start_date.month,
-                    'day': start_date.day
-                },
-                'img_url': img_url,
-                'course_info_url': course_info_url,
-            })
-    except Exception as e:
-        utils.admin.email_html_error(e, page)
-        raise e
-
-    return courses
+def __past__(course):
+    date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
+    start_date = datetime.strptime(date_block[-1], '%Y-%m-%d')
+    university = course.find('h2', attrs={'class': 'university'}).text
+    id_title = course.find('section', attrs={'class': 'info'}).find('h3').find('a').text.split()
+    course_id = id_title[0]
+    title = id_title[1]
+    img_url = full_url(course.find('img').attrs['src'])
+    course_info_url = full_url(course.find('a', attrs={'class': 'enter-course'}).attrs['href'])
+    return {
+        'university': university,
+        'id': course_id,
+        'title': title,
+        'start_date': {
+            'year': start_date.year,
+            'month': start_date.month,
+            'day': start_date.day
+        },
+        'img_url': img_url,
+        'course_info_url': course_info_url,
+    }
 
 def courses_selected(email, password):
     """
@@ -204,8 +164,25 @@ def courses_selected(email, password):
     password: str
     => (courses_upcoming, courses_current, courses_past)
     """
+    upcoming = []
+    current = []
+    past = []
     page = __get_page__(DASHBOARD, email, password)
-    return (__upcoming__(page), __current__(page), __past__(page))
+    try:
+        page = BeautifulSoup(page)
+        for course in page.findAll('article', attrs={'class': 'my-course'}):
+            date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
+            if date_block[0] == u'课程开始':
+                upcoming.append(__upcoming__(course))
+            elif date_block[0] == u'课程已开始':
+                current.append(__current__(course))
+            elif date_block[0] == u'课程完成度':
+                past.append(__past__(course))
+    except Exception as e:
+        utils.admin.email_html_error(e, page)
+        raise e
+
+    return (upcoming, current, past)
 
 def courses_upcoming(email, password):
     """
@@ -213,8 +190,19 @@ def courses_upcoming(email, password):
     password: str
     => list(course*)
     """
+    upcoming = []
     page = __get_page__(DASHBOARD, email, password)
-    return __upcoming__(page)
+    try:
+        page = BeautifulSoup(page)
+        for course in page.findAll('article', attrs={'class': 'my-course'}):
+            date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
+            if date_block[0] == u'课程开始':
+                upcoming.append(__upcoming__(course))
+    except Exception as e:
+        utils.admin.email_html_error(e, page)
+        raise e
+
+    return upcoming
 
 def courses_current(email, password):
     """
@@ -222,8 +210,19 @@ def courses_current(email, password):
     password: str
     => list(course*)
     """
+    current = []
     page = __get_page__(DASHBOARD, email, password)
-    return __current__(page)
+    try:
+        page = BeautifulSoup(page)
+        for course in page.findAll('article', attrs={'class': 'my-course'}):
+            date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
+            if date_block[0] == u'课程已开始':
+                current.append(__current__(course))
+    except Exception as e:
+        utils.admin.email_html_error(e, page)
+        raise e
+
+    return current
 
 def courses_past(email, password):
     """
@@ -231,5 +230,16 @@ def courses_past(email, password):
     password: str
     => list(course*)
     """
+    past = []
     page = __get_page__(DASHBOARD, email, password)
-    return __past__(page)
+    try:
+        page = BeautifulSoup(page)
+        for course in page.findAll('article', attrs={'class': 'my-course'}):
+            date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
+            if date_block[0] == u'课程完成度':
+                past.append(__past__(course))
+    except Exception as e:
+        utils.admin.email_html_error(e, page)
+        raise e
+
+    return past

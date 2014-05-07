@@ -138,8 +138,7 @@ def courses_current(email, password):
     from datetime import datetime
 
     courses = []
-    # try:
-    if True:
+    try:
         page = BeautifulSoup(page)
         for course in page.findAll('article', attrs={'class': 'my-course'}):
             date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
@@ -164,9 +163,9 @@ def courses_current(email, password):
                 'img_url': img_url,
                 'course_info_url': course_info_url,
             })
-    # except Exception as e:
-        # utils.admin.email_html_error(e, page)
-        # raise e
+    except Exception as e:
+        utils.admin.email_html_error(e, page)
+        raise e
 
     return courses
 

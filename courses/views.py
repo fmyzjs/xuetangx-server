@@ -37,12 +37,13 @@ def current(request):
     except (ValueError, KeyError):
         return HttpResponse(utils.template.invalid_request())
 
-    try:
+    # try:
+    if True:
         courses = xuetangx.courses_current(email, password)
-    except xuetangx.AuthenticationError:
-        return HttpResponse(utils.template.authen_error())
-    except Exception:
-        return HttpResponse(utils.template.server_error())
+    # except xuetangx.AuthenticationError:
+    #     return HttpResponse(utils.template.authen_error())
+    # except Exception:
+    #     return HttpResponse(utils.template.server_error())
 
     return HttpResponse(utils.template.respond({
         'courses.current': courses,

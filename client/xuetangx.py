@@ -14,12 +14,12 @@ LOGIN_PAGE = HTTPS + HOST + '/login'
 LOGIN_URL = HTTPS + HOST + '/login_ajax'
 DASHBOARD = HTTPS + HOST + '/dashboard'
 COURSES = HTTP + HOST + '/courses'
+SEARCH = HTTPS + HOST + '/courses/search'
 BASE_URL = HTTPS + HOST
 
 def full_url(path):
-    if path[0] == '/':
-        return BASE_URL + path
-    return path
+    import urlparse
+    return urlparse.urljoin(BASE_URL, path)
 
 class AuthenticationError(Exception):
     pass
@@ -48,9 +48,9 @@ def __get_opener__(email=None, password=None):
 
     return opener
 
-def __get_page__(url, email=None, password=None):
+def __get_page__(url, email=None, password=None, data=None):
     opener = __get_opener__(email, password)
-    return opener.open(url).read()
+    return opener.open(url, data=data).read()
 
 def verify(email, password):
     """
@@ -217,10 +217,69 @@ def courses_categories():
     categories = []
     for item in page.find('div', attrs={'class': 'xkfl'}).findAll('a'):
         cid = item.attrs['data-id']
-        title = item.text
+        pattern = re.compile(u'([^\(]+)\(\s*(\d+)\s*\)', re.UNICODE)
+        m_title = pattern.search(item.text)
+        title = m_title.group(1)
+        count = int(m_title.group(2))
         categories.append({
             'id': cid,
             'title': title,
+            'count': count,
         })
 
     return categories
+
+def __bool2_str__(b):
+    return ('true' if b else 'false')
+
+def courses_search(query=None, cid=None, started=False, hasTA=False):
+    query_dict = {
+        'offset': 0,
+        'limit': 1000000,
+    }
+    if query is not None:
+        query_dict['query'] = query
+    if cid is not None:
+        query_dict['cid'] = cid
+    query_dict['started'] = __bool2_str__(started)
+    query_dict['hasTA'] = __bool2_str__(hasTA)
+    postdata = urllib.urlencode(query_dict)
+
+    print postdata
+
+    page = __get_page__(SEARCH, data=postdata)
+    import json
+    page = json.loads(page)
+
+    result = []
+    for course in page['data']:
+        owner = course['owner']
+        university = course['org']
+        course_id = course['course_num']
+        title = course['name']
+        img_url = full_url(course['thumbnail'])
+        course_about_url = full_url(course['href'])
+        teacher_name = course.get('staff_name', '')
+        teacher_title = course.get('staff_title', '')
+        update_info = course['modified'] # 更新于`几天前`，str
+        serialized_no = course['serialized'] # 连载至第`几`讲，int, default -1
+        hasTA = course['hasTA'] # bool
+        subtitle = course['subtitle'] # 课程简介
+        result.append({
+            'owner': owner,
+            'university': university,
+            'id': course_id,
+            'title': title,
+            'img_url': img_url,
+            'course_about_url': course_about_url,
+            'teacher': {
+                'name': teacher_name,
+                'title': teacher_title,
+            },
+            'update_info': update_info,
+            'serialized_no': serialized_no,
+            'hasTA': hasTA,
+            'subtitle': subtitle,
+        })
+
+    return result

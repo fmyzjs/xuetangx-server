@@ -50,15 +50,19 @@ def categories(request):
         'courses.categories': xuetangx.courses_categories(),
     }))
 
+def __str2bool__(string):
+    return string.lower() in ('yes', 'true', 't', '1')
+
 def search(request):
-    key = request.GET['key']
-    category = request.GET['category']
-    started = bool(request.GET['started'])
-    hasTA = bool(request.GET['hasTA'])
-    # TODO: check whether category in the list
+    query = request.GET.get('query', None)
+    cid = request.GET.get('cid', None)
+    started = __str2bool__(request.GET.get('started', 'false'))
+    hasTA = __str2bool__(request.GET.get('hasTA', 'false'))
+
+    result = xuetangx.courses_search(query, cid, started, hasTA)
 
     return HttpResponse(utils.template.respond({
-        'TODO': 'TODO',
+        'courses.search': result,
     }))
 
 def about(request):

@@ -122,13 +122,30 @@ APIs
 
     POST
     => { 'courses.categories': [
-        { 'id': str, 'title': str }*
+        { 'id': str, 'title': str, 'count': int }*
     ] }
 
 #### search
 
-    POST { 'key': str, 'category': str, 'started': bool, 'hasTA': bool }
-    =>
+    POST { 'query': str, 'cid': str, 'started': str, 'hasTA': str } (All fields are optional)
+    => { 'courses.search': [@course] }
+
+    @course: {
+        'owner': str,
+        'university': str,
+        'id': str,
+        'title': str,
+        'img_url': str,
+        'course_about_url': str,
+        'teacher': {
+            'name': str, # may be empty str
+            'title': str, # may be empty str
+        },
+        'update_info': str,
+        'serialized_no': int, # -1 if none
+        'hasTA': bool,
+        'subtitle': str,
+    }
 
 #### about
 

@@ -245,8 +245,6 @@ def courses_search(query=None, cid=None, started=False, hasTA=False):
     query_dict['hasTA'] = __bool2_str__(hasTA)
     postdata = urllib.urlencode(query_dict)
 
-    print postdata
-
     page = __get_page__(SEARCH, data=postdata)
     import json
     page = json.loads(page)

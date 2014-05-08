@@ -76,16 +76,16 @@ def student_info(email, password):
 
     from bs4 import BeautifulSoup
     page = BeautifulSoup(page)
-    name = page.body.find('span', attrs={'class': 'data'}).text
-    nickname = page.body.find('h1', attrs={'class': 'user-name'}).text
+    name = page.body.find('span', attrs={'class': 'data'}).text.strip()
+    nickname = page.body.find('h1', attrs={'class': 'user-name'}).text.strip()
 
     return (name, nickname)
 
 def __upcoming__(course):
     date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
     start_date = datetime.strptime(date_block[-1], '%Y-%m-%d')
-    university = course.find('h2', attrs={'class': 'university'}).text
-    id_title = course.find('section', attrs={'class': 'info'}).find('h3').find('span').text.split()
+    university = course.find('h2', attrs={'class': 'university'}).text.strip()
+    id_title = course.find('section', attrs={'class': 'info'}).find('h3').find('span').text.strip().split()
     course_id = id_title[0]
     title = id_title[1]
     img_url = full_url(course.find('img').attrs['src'])
@@ -104,8 +104,8 @@ def __upcoming__(course):
 def __current__(course):
     date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
     start_date = datetime.strptime(date_block[-1], '%Y-%m-%d')
-    university = course.find('h2', attrs={'class': 'university'}).text
-    id_title = course.find('section', attrs={'class': 'info'}).find('h3').find('a').text.split()
+    university = course.find('h2', attrs={'class': 'university'}).text.strip()
+    id_title = course.find('section', attrs={'class': 'info'}).find('h3').find('a').text.strip().split()
     course_id = id_title[0]
     title = id_title[1]
     img_url = full_url(course.find('img').attrs['src'])
@@ -126,8 +126,8 @@ def __current__(course):
 def __past__(course):
     date_block = course.find('p', attrs={'class': 'date-block'}).text.strip().split()
     start_date = datetime.strptime(date_block[-1], '%Y-%m-%d')
-    university = course.find('h2', attrs={'class': 'university'}).text
-    id_title = course.find('section', attrs={'class': 'info'}).find('h3').find('a').text.split()
+    university = course.find('h2', attrs={'class': 'university'}).text.strip()
+    id_title = course.find('section', attrs={'class': 'info'}).find('h3').find('a').text.strip().split()
     course_id = id_title[0]
     title = id_title[1]
     img_url = full_url(course.find('img').attrs['src'])
@@ -223,7 +223,7 @@ def courses_categories():
     for item in page.find('div', attrs={'class': 'xkfl'}).findAll('a'):
         cid = item.attrs['data-id']
         pattern = re.compile(u'([^\(]+)\(\s*(\d+)\s*\)', re.UNICODE)
-        m_title = pattern.search(item.text)
+        m_title = pattern.search(item.text.strip())
         title = m_title.group(1)
         count = int(m_title.group(2))
         categories.append({
@@ -363,7 +363,7 @@ def __ware__(opener, url, need_items=True):
 
         lectures = []
         for lecture in chapter.findAll('li', attrs={'class': ' graded'}):
-            le_title = lecture.find('p').text
+            le_title = lecture.find('p').text.strip()
             le_url = full_url(lecture.find('a').attrs['href'])
             lecture_basis = {
                 'lecture_title': le_title,

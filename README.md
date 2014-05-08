@@ -3,26 +3,11 @@ XuetangX Server
 
 http://xuetangxserver.sinaapp.com/
 
-
 **NOTE**: Remember to CHANGE POST TO GET after dev
 
 
-Design
-------
-
-- xuetangx  => main
-
-- ^student/ -- ^verify/$    POST email, password => true/false
-            |- ^info/$      POST email, password => name, nickname
-
-- ^courses/ -- ^selected$   POST email, password => all selected courses
-            |- ^upcoming/$  POST email, password => upcoming courses
-            |- ^current/$   POST email, password => current courses
-            |- ^past/$      POST email, password => past courses
-            |- ^search/$    POST category, started, hasTA => satisfied courses
-            |- ^about/$     POST url => course introduction page
-            |- ^info/$      POST email, password, url => course main page
-            |- ^ware/$      POST email, password, url => courseware page
+APIs
+----
 
 ```
 response header:
@@ -37,13 +22,9 @@ response header:
         - true  => ...
 ```
 
-
-APIs
-----
-
 ### student
 
-#### verify (atually, no extra field is needed)
+#### verify
 
     POST { 'email': str, 'password': str }
     => { 'student.verify': bool }
@@ -120,7 +101,7 @@ APIs
 
 #### categories
 
-    POST
+    POST Nothing
     => { 'courses.categories': [
         { 'id': str, 'title': str, 'count': int }*
     ] }
@@ -147,18 +128,88 @@ APIs
         'subtitle': str,
     }
 
-#### about
+#### unenroll # ONLY courses owner='xuetangX' can do this
 
-    POST { 'url': str }
-    =>
+    POST { 'email': str, 'password': str, 'url': str } # full course about/info url
+    => { 'courses.unenroll': bool }
 
-#### info
 
-    POST { 'email': str, 'password': str, 'url': str }
-    =>
+#### enroll # ONLY courses owner='xuetangX' can do this
+
+    POST { 'email': str, 'password': str, 'url': str } # full course about/info url
+    => { 'courses.enroll': bool }
+
+
+#### lectures # get lecture content
+
+    POST { 'email': str, 'password': str, 'url': str } # course info url
+    => {
+        'courses.lectures': [@chapter],
+    }
+
+    @chapter: {
+        'chapter_title': str,
+        'chapter_lectures': [@lecture],
+    }
+
+    @lecture: {
+        'lecture_title': str,
+        'lecture_url': str,
+    }
+
+
+#### lecture # get detail of ONE lecture
+
+    POST { 'email': str, 'password': str, 'url': str } # lecture url
+    => {
+        'courses.lecture': [@item],
+    }
+
+    @item: {
+        'item_type': str,
+        'item_url': item_url, # see NOTE below
+    }
+
+    NOTE:
+        if item.item_type == 'problem'
+        then
+            item.item_url is the full url:str to the lecture which item belonging to
+        else -> item.item_type == 'video'
+            {
+                'high-quality': [str*],
+                'low-quality': [str*],
+            }
+
 
 #### ware
 
-    POST { 'email': str, 'password': str, 'url': str }
-    =>
+    POST { 'email': str, 'password': str, 'url': str } # course info url
+    => {
+        'courses.ware': [@chapter],
+    }
 
+    @chapter: {
+        'chapter_title': str,
+        'chapter_lectures': [@lecture],
+    }
+
+    @lecture: {
+        'lecture_title': str,
+        'lecture_url': str,
+        'lecture_items': [@item],
+    }
+
+    @item: {
+        'item_type': str,
+        'item_url': item_url, # see NOTE below
+    }
+
+    NOTE:
+        if item.item_type == 'problem'
+        then
+            item.item_url is the full url:str to the lecture which item belonging to
+        else -> item.item_type == 'video'
+            {
+                'high-quality': [str*],
+                'low-quality': [str*],
+            }

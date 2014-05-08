@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+import re
+import json
 import urllib
 from datetime import datetime
 
@@ -10,16 +12,20 @@ from bs4 import BeautifulSoup
 HTTP = 'http://'
 HTTPS = 'https://'
 HOST = 'www.xuetangx.com'
-LOGIN_PAGE = HTTPS + HOST + '/login'
-LOGIN_URL = HTTPS + HOST + '/login_ajax'
-DASHBOARD = HTTPS + HOST + '/dashboard'
-COURSES = HTTP + HOST + '/courses'
-SEARCH = HTTPS + HOST + '/courses/search'
-BASE_URL = HTTPS + HOST
+BASE_URL_S = HTTPS + HOST
+BASE_URL = HTTP + HOST
+LOGIN_PAGE = BASE_URL_S + '/login'
+LOGIN_URL = BASE_URL_S + '/login_ajax'
+DASHBOARD = BASE_URL_S + '/dashboard'
+SEARCH = BASE_URL_S + '/courses/search'
+COURSES = BASE_URL + '/courses'
+ENROLLMENT = BASE_URL_S + '/change_enrollment'
+_COURSEWARE = '/courseware'
+_VIDEO2SRC = BASE_URL_S + '/videoid2source/'
 
 def full_url(path):
     import urlparse
-    return urlparse.urljoin(BASE_URL, path)
+    return urlparse.urljoin(BASE_URL_S, path)
 
 class AuthenticationError(Exception):
     pass
@@ -40,7 +46,6 @@ def __get_opener__(email=None, password=None):
         'password': password}).encode('utf-8')
     resp = opener.open(LOGIN_URL, postdata).read()
 
-    import json
     success = json.loads(resp)['success']
 
     if not success:
@@ -238,15 +243,14 @@ def courses_search(query=None, cid=None, started=False, hasTA=False):
         'limit': 1000000,
     }
     if query is not None:
-        query_dict['query'] = query
+        query_dict['query'] = query.encode('utf-8')
     if cid is not None:
         query_dict['cid'] = cid
     query_dict['started'] = __bool2_str__(started)
     query_dict['hasTA'] = __bool2_str__(hasTA)
-    postdata = urllib.urlencode(query_dict)
+    postdata = urllib.urlencode(query_dict).encode('utf-8')
 
     page = __get_page__(SEARCH, data=postdata)
-    import json
     page = json.loads(page)
 
     result = []
@@ -281,3 +285,104 @@ def courses_search(query=None, cid=None, started=False, hasTA=False):
         })
 
     return result
+
+def __extract_course_id__(url):
+    pattern = re.compile('/courses/(.+)/[(about)(info)]')
+    m_id = pattern.search(url)
+    return m_id.group(1)
+
+def courses_enrollment(email, password, url, action):
+    course_id = __extract_course_id__(url)
+    postdata = {
+        'course_id': course_id,
+        'enrollment_action': action,
+    }
+    postdata = urllib.urlencode(postdata).encode('utf-8')
+    opener = __get_opener__(email, passworsd)
+
+    conn = opener.open(ENROLLMENT, data=postdata)
+
+    return conn.code == 200
+
+def __courseware_url__(about_or_info_url):
+    course_id = __extract_course_id__(about_or_info_url)
+    return BASE_URL + '/courses/' + course_id + _COURSEWARE
+
+def courses_lectures(email, password, url):
+    url = __courseware_url__(url)
+    opener = __get_opener__(email, password)
+
+    return __ware__(opener, url, need_items=False)
+
+def courses_lecture(email, password, url):
+    opener = __get_opener__(email, password)
+    return __items__(opener, url)
+
+def __items__(opener, lecture_url):
+    raw_page = opener.open(lecture_url).read()
+    ptn_video = '&lt;source type=&#34;video/mp4&#34; src=&#34;([^&#;]+)&#34;/&gt;'
+    video_ids = re.findall(ptn_video, raw_page)
+    video_ids_idx = 0
+
+    page = BeautifulSoup(raw_page)
+
+    items = []
+    for item in page.find('ol', attrs={'id': 'sequence-list'}).findAll('li'):
+        item_class = item.find('a').attrs['class']
+        if 'seq_video' in item_class:
+            item_type = 'video'
+            get_item_url = _VIDEO2SRC + video_ids[video_ids_idx]
+            video_ids_idx += 1
+            item_urls_json = json.loads(opener.open(get_item_url).read())['sources']
+            item_url = {}
+            item_url['high-quality'] = []
+            for src in item_urls_json['quality20']:
+                item_url['high-quality'].append(src)
+            item_url['low-quality'] = []
+            for src in item_urls_json['quality10']:
+                item_url['low-quality'].append(src)
+        elif 'seq_problem' in item_class or 'seq_other' in item_class:
+            item_type = 'problem'
+            item_url = lecture_url
+        else:
+            raise AttributeError('Lecture item not consistent: %s, %s' % (item_class, lecture_url))
+        items.append({
+            'item_type': item_type,
+            'item_url': item_url,
+        })
+
+    return items
+
+def __ware__(opener, url, need_items=True):
+    page = opener.open(url).read()
+    page = BeautifulSoup(page)
+
+    chapters = []
+    for chapter in page.findAll('div', attrs={'class': 'chapter'}):
+        ch_title = chapter.find('h3').text.strip()
+
+        lectures = []
+        for lecture in chapter.findAll('li', attrs={'class': ' graded'}):
+            le_title = lecture.find('p').text
+            le_url = full_url(lecture.find('a').attrs['href'])
+            lecture_basis = {
+                'lecture_title': le_title,
+                'lecture_url': le_url,
+            }
+            if need_items:
+                lecture_basis['lecture_items'] = __items__(opener, le_url)
+
+            lectures.append(lecture_basis)
+
+        chapters.append({
+            'chapter_title': ch_title,
+            'chapter_lectures': lectures,
+        })
+
+    return chapters
+
+def courses_ware(email, password, url):
+    url = __courseware_url__(url)
+    opener = __get_opener__(email, password)
+
+    return __ware__(opener, url, need_items=True)

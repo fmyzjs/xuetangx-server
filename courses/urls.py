@@ -9,8 +9,10 @@ urlpatterns = patterns('',
     url(r'^past/$', views.past),
     url(r'^categories/$', views.categories),
     url(r'^search/$', views.search),
-    url(r'^about/$', views.about),
-    url(r'^info/$', views.info),
+    url(r'^unenroll/$', views.unenroll),
+    url(r'^enroll/$', views.enroll),
+    url(r'^lectures/$', views.lectures),
+    url(r'^lecture/$', views.lecture),
     url(r'^ware/$', views.ware),
 )
 

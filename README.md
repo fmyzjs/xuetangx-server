@@ -102,9 +102,13 @@ response header:
 #### categories
 
     POST Nothing
-    => { 'courses.categories': [
-        { 'id': str, 'title': str, 'count': int }*
-    ] }
+    => { 'courses.categories': [@category] }
+
+    @category: {
+        'id': str,
+        'title': str,
+        'count': int
+    }
 
 #### search
 
@@ -167,7 +171,7 @@ response header:
 
     @item: {
         'item_type': str,
-        'item_url': item_url, # see NOTE below
+        'item_url': str, # see NOTE below
     }
 
     NOTE:

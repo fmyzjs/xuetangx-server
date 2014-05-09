@@ -298,7 +298,7 @@ def courses_enrollment(email, password, url, action):
         'enrollment_action': action,
     }
     postdata = urllib.urlencode(postdata).encode('utf-8')
-    opener = __get_opener__(email, passworsd)
+    opener = __get_opener__(email, password)
 
     conn = opener.open(ENROLLMENT, data=postdata)
 

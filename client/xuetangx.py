@@ -362,7 +362,7 @@ def __ware__(opener, url, need_items=True):
         ch_title = chapter.find('h3').text.strip()
 
         lectures = []
-        for lecture in chapter.findAll('li', attrs={'class': ' graded'}):
+        for lecture in chapter.findAll('li'):
             le_title = lecture.find('p').text.strip()
             le_url = full_url(lecture.find('a').attrs['href'])
             lecture_basis = {

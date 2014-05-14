@@ -204,6 +204,7 @@ response header:
     }
 
     @item: {
+        'item_title': str,
         'item_type': str,
         'item_url': item_url, # see NOTE below
     }

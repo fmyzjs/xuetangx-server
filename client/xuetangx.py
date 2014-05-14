@@ -329,6 +329,7 @@ def __items__(opener, lecture_url):
     items = []
     for item in page.find('ol', attrs={'id': 'sequence-list'}).findAll('li'):
         item_class = item.find('a').attrs['class']
+        item_title = item.find('a').find('p').text.strip()
         if 'seq_video' in item_class:
             item_type = 'video'
             get_item_url = _VIDEO2SRC + video_ids[video_ids_idx]
@@ -347,6 +348,7 @@ def __items__(opener, lecture_url):
         else:
             raise AttributeError('Lecture item not consistent: %s, %s' % (item_class, lecture_url))
         items.append({
+            'item_title': item_title,
             'item_type': item_type,
             'item_url': item_url,
         })

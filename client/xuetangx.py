@@ -252,7 +252,7 @@ def courses_search(query=None, cid=None, started=False, hasTA=False, offset=0, l
 
     page = __get_page__(SEARCH, data=postdata)
     page = json.loads(page)
-    next_offset = int(page['next_parameters']['offset'])
+    next_offset = int(page['next_parameters'].get('offset', '-1'))
 
     result = []
     for course in page['data']:

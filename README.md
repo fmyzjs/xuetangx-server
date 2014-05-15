@@ -113,7 +113,9 @@ response header:
 #### search
 
     POST { 'query': str, 'cid': str, 'started': str, 'hasTA': str, 'offset': str, 'limit': str } (All fields are optional, `offset` default 0, `limit` default big enough)
-    => { 'next_offset': int, 'courses.search': [@course] }
+    => {
+        'next_offset': int, # -1 if none
+        'courses.search': [@course] }
 
     @course: {
         'owner': str,

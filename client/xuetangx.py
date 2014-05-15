@@ -237,10 +237,10 @@ def courses_categories():
 def __bool2_str__(b):
     return ('true' if b else 'false')
 
-def courses_search(query=None, cid=None, started=False, hasTA=False):
+def courses_search(query=None, cid=None, started=False, hasTA=False, offset=0, limit=10000000):
     query_dict = {
-        'offset': 0,
-        'limit': 1000000,
+        'offset': offset,
+        'limit': limit,
     }
     if query is not None:
         query_dict['query'] = query.encode('utf-8')
@@ -252,6 +252,7 @@ def courses_search(query=None, cid=None, started=False, hasTA=False):
 
     page = __get_page__(SEARCH, data=postdata)
     page = json.loads(page)
+    next_offset = int(page['next_parameters']['offset'])
 
     result = []
     for course in page['data']:
@@ -284,7 +285,7 @@ def courses_search(query=None, cid=None, started=False, hasTA=False):
             'subtitle': subtitle,
         })
 
-    return result
+    return result, next_offset
 
 def __extract_course_id__(url):
     pattern = re.compile('/courses/(.+)/[(about)(info)]')

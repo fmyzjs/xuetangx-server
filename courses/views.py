@@ -58,11 +58,14 @@ def search(request):
     cid = request.POST.get('cid', None)
     started = __str2bool__(request.POST.get('started', 'false'))
     hasTA = __str2bool__(request.POST.get('hasTA', 'false'))
+    offset = int(request.POST.get('offset', '0'))
+    limit = int(request.POST.get('limit', '1000000000'))
 
-    result = xuetangx.courses_search(query, cid, started, hasTA)
+    result, next_offset = xuetangx.courses_search(query, cid, started, hasTA, offset, limit)
 
     return HttpResponse(utils.template.respond({
         'courses.search': result,
+        'next_offset': next_offset,
     }))
 
 def unenroll(request):

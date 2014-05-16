@@ -14,6 +14,7 @@ urlpatterns = patterns('',
     url(r'^lectures/$', views.lectures),
     url(r'^lecture/$', views.lecture),
     url(r'^ware/$', views.ware),
+    url(r'^video/$', views.video),
 )
 
 

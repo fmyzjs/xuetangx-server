@@ -389,3 +389,8 @@ def courses_ware(email, password, url):
     opener = __get_opener__(email, password)
 
     return __ware__(opener, url, need_items=True)
+
+def video_url(url):
+    opener = __get_opener__()
+    f = opener.open(url)
+    return f.geturl()

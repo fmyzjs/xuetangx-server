@@ -127,3 +127,11 @@ def ware(request):
         'courses.ware': chapters,
     }))
 
+def video(request):
+    url = request.POST['url']
+
+    url = xuetangx.video_url(url)
+
+    return HttpResponse(utils.template.respond({
+        'video.url': url,
+    }))

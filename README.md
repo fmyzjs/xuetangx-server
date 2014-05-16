@@ -220,3 +220,9 @@ response header:
                 'high-quality': [str*],
                 'low-quality': [str*],
             }
+
+
+#### video
+
+    POST { 'url': str }
+    => { 'video.url': str }
